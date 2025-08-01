@@ -1,0 +1,7 @@
+config.py
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+uploads/*.mp4

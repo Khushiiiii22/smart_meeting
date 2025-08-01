@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meeting Summary & Minutes</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      color: #212529;
+      margin: 0;
+      padding: 20px 40px;
+      line-height: 1.6;
+    }
+    h1, h2 {
+      color: #343a40;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #6c757d;
+      padding-bottom: 6px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 30px 30px 40px 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 6px;
+      font-size: 1rem;
+      color: #495057;
+    }
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 1rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      border: 1.8px solid #ced4da;
+      border-radius: 6px;
+      resize: vertical;
+      min-height: 100px;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+    }
+    .textarea-large {
+      min-height: 240px;
+      font-family: monospace; /* to better show structured MoM and summary */
+      white-space: pre-wrap;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      font-size: 1.1rem;
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+    .back-link:hover,
+    .back-link:focus {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+    fieldset {
+      margin-top: 30px;
+      border: 1px solid #ced4da;
+      padding: 15px 20px;
+      border-radius: 6px;
+    }
+    legend {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #343a40;
+    }
+    input[type="checkbox"] {
+      margin-right: 10px;
+    }
+    button[type="submit"] {
+      margin-top: 30px;
+      background-color: #007bff;
+      color: white;
+      font-weight: 600;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    button[type="submit"]:hover,
+    button[type="submit"]:focus {
+      background-color: #0056b3;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 20px 15px;
+      }
+      .container {
+        padding: 20px 15px 30px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="Meeting Summary and Minutes">
+    <h1>Meeting Summary & Minutes</h1>
+
+    <form method="POST" action="{{ url_for('finalize_and_share') }}">
+      <label for="mom">Minutes of Meeting</label>
+      <input type="hidden" name="mom_json" value='{{ mom_json | tojson | safe }}'>
+
+      <!-- Hidden input for raw JSON MoM dict -->
+
+      <textarea id="mom" class="textarea-large" readonly name="mom">{{ mom }}</textarea>
+
+      <label for="summary">Summary</label>
+      <textarea id="summary" rows="6" readonly>{{ summary }}</textarea>
+
+      <label for="transcription">Original Transcription (Editable)</label>
+      <textarea id="transcription" class="textarea-large" name="transcription">{{ transcription }}</textarea>
+
+      <fieldset>
+        <legend>Select Internal Members to send ORIGINAL MoM</legend>
+        {% for email in internal_members %}
+          <label>
+            <input type="checkbox" name="internal_members" value="{{ email }}" checked>
+            {{ email }}
+          </label><br />
+        {% endfor %}
+      </fieldset>
+
+      <fieldset>
+        <legend>Select Non-Members to send CUSTOMIZED MoM</legend>
+        {% for email in non_members %}
+          <label>
+            <input type="checkbox" name="non_members" value="{{ email }}" checked>
+            {{ email }}
+          </label><br />
+        {% endfor %}
+      </fieldset>
+
+      <button type="submit">Share MoM</button>
+    </form>
+
+    <a class="back-link" href="{{ url_for('upload_and_transcribe') }}" aria-label="Upload another file">
+      &larr; Upload another file
+    </a>
+  </div>
+</body>
+</html>
