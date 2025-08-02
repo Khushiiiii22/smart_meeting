@@ -122,7 +122,7 @@ def customize_mom_for_non_members(mom_dict):
     return redacted
 
 
-@app.route('/finalize(meetingvideo & share)', methods=['POST'])
+@app.route('/finalize(meetingvideo (mom) & share)', methods=['POST'])
 def finalize_and_share():
     transcription = request.form.get('transcription', '').strip()
     mom_text = request.form.get('mom', '').strip()  # markdown text for display, not used for PDF generation
