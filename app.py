@@ -18,7 +18,7 @@ UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-@app.route('/uploadmeetingvideo', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def upload_and_transcribe():
     if request.method == 'POST':
         if 'file' not in request.files or request.files['file'].filename == '':
@@ -45,7 +45,7 @@ def upload_and_transcribe():
 
     return render_template('transcribe.html')
 
-@app.route('/generate(meetingvideotranscript)', methods=['POST'])
+@app.route('/generate', methods=['POST'])
 def generate_mom_summary():
     transcription = request.form.get('transcription')
     if not transcription or transcription.strip() == '':
@@ -122,7 +122,7 @@ def customize_mom_for_non_members(mom_dict):
     return redacted
 
 
-@app.route('/finalize(meetingvideo (mom) & share)', methods=['POST'])
+@app.route('/finalize', methods=['POST'])
 def finalize_and_share():
     transcription = request.form.get('transcription', '').strip()
     mom_text = request.form.get('mom', '').strip()  # markdown text for display, not used for PDF generation
