@@ -29,17 +29,27 @@
       font-weight: 600;
     }
 
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      color: #495057;
+    }
+
     textarea {
       width: 100%;
       padding: 12px 14px;
       font-size: 1rem;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Consolas', 'Courier New', monospace, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       border: 1.8px solid #ced4da;
       border-radius: 6px;
       resize: vertical;
       min-height: 320px;
       box-sizing: border-box;
       transition: border-color 0.3s ease;
+      white-space: pre-wrap; /* preserves line breaks and whitespace */
+      overflow-wrap: break-word;
     }
 
     textarea:focus {
@@ -88,8 +98,10 @@
   <main class="container" role="main" aria-label="Edit transcribed text">
     <h2>Edit the Transcription</h2>
     <form method="POST" action="{{ url_for('generate_mom_summary') }}" novalidate>
-      <textarea name="transcription" aria-label="Editable transcription text">{{ transcription }}</textarea>
-      <button type="submit" aria-label="Generate Minutes of Meeting and Summary">
+      <label for="transcription-textarea">Editable Transcription Text</label>
+      <textarea name="transcription" spellcheck="false" autocomplete="off" style="white-space: pre-wrap;">{{ transcription }}</textarea>
+
+      <button type="submit" aria-label="Generate Minutes of Meeting and Summary" title="Generate Minutes of Meeting and Summary">
         Generate Minutes of Meeting &amp; Summary
       </button>
     </form>

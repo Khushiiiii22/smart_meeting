@@ -4,6 +4,8 @@ import time
 from utils.stt import get_transcript
 from utils.nlp import generate_summary, generate_minutes_of_meeting  # we'll add this function
 import config
+from utils.nlp import transcribe_audio
+from utils.nlp import format_transcript
 from utils.email_utils import send_email
 import json
 from utils.format_utils import format_mom_as_markdown
@@ -41,7 +43,13 @@ def upload_and_transcribe():
             return render_template('transcribe.html')
 
         # Render a page showing editable transcription with form to submit for summary/MoM
-        return render_template('edit_transcription.html', transcription=transcription)
+        transcript_text, transcript_json = transcribe_audio(local_path)
+        formatted_transcript = format_transcript(transcript_json)
+        
+        print("transcript_text:", repr(transcript_text))
+        print("transcript_json:", transcript_json)
+        print("formatted_transcript:", repr(formatted_transcript))
+        return render_template('edit_transcription.html', transcription=formatted_transcript)
 
     return render_template('transcribe.html')
 
