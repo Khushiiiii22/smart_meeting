@@ -1,12 +1,69 @@
-<!-- templates/share_success.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Success</title>
+    <meta charset="UTF-8" />
+    <title>MoM Shared Successfully</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            max-width: 600px;
+            margin: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        li {
+            background: #e7f5e7;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #2e7d32;
+        }
+    </style>
 </head>
 <body>
-    <h1>Minutes of Meeting shared successfully!</h1>
-    <p>The MoM has been sent to all internal and non-members.</p>
-    <a href="{{ url_for('upload_and_transcribe') }}">Back to Upload</a>
+    <div class="container">
+        <h1>Minutes of Meeting Shared Successfully!</h1>
+        <p>The Minutes of Meeting have been saved and emailed to the selected recipients.</p>
+
+        <h3>Recipients who received the MoM:</h3>
+
+        {% if internal_members %}
+        <h4>Internal Members:</h4>
+        <ul>
+            {% for member in internal_members %}
+            <li>{{ member }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No internal members selected.</p>
+        {% endif %}
+
+        {% if non_members %}
+        <h4>External Members:</h4>
+        <ul>
+            {% for member in non_members %}
+            <li>{{ member }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No external members selected.</p>
+        {% endif %}
+
+        <a href="{{ url_for('upload_and_transcribe') }}">Back to Upload</a>
+    </div>
 </body>
 </html>
