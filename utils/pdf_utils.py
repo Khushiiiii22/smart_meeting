@@ -210,17 +210,17 @@ def create_mom_pdf(mom_data_dict):
         elements.append(Spacer(1, 12))
 
     # Key Discussions section: Box only the title, content flows normally with page breaks
+    # Key Discussions section: Plain heading (no box)
     discussions = mom_data_dict.get('discussions')
     if discussions:
-        # Boxed title only
         discussion_title = Paragraph("Key Discussions:", section_title_style)
-        elements.append(create_boxed_section(discussion_title, []))  # Box title only with no content
+        elements.append(discussion_title)
         elements.append(Spacer(1, 6))
 
-        # Add discussion content flowables after box
         discussion_flowables = build_discussion_flowables(discussions)
         elements.extend(discussion_flowables)
         elements.append(Spacer(1, 12))
+
 
     # Action Points / Decisions boxed
     actions = mom_data_dict.get('actions')

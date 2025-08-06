@@ -22,19 +22,18 @@ def send_email(to_email, subject, body, pdf_buffer=None, pdf_filename="Minutes_o
         pdf_buffer.seek(0)
         pdf_data = pdf_buffer.read()
         pdf_attachment = MIMEApplication(pdf_data, _subtype="pdf")
-        pdf_attachment.add_header('Content-Disposition', 'attachment', filename=pdf_filename)
-        pdf_attachment.add_header('Content-Type', 'application/pdf')
-        pdf_attachment.add_header('Content-Transfer-Encoding', 'base64')
+        pdf_attachment.add_header('Content-Disposition', 'inline', filename=pdf_filename)
+        # No need to add 'Content-Type' or 'Content-Transfer-Encoding' headers manually here
         msg.attach(pdf_attachment)
 
 
+
     try:
-        # Connect to SMTP server and send email
-        server = smtplib.SMTP(config.EMAIL_SMTP_SERVER, config.EMAIL_SMTP_PORT)
-        server.starttls()
-        server.login(sender_email, sender_password)
-        server.send_message(msg)
-        server.quit()
+        with smtplib.SMTP(config.EMAIL_SMTP_SERVER, config.EMAIL_SMTP_PORT) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.send_message(msg)
         print(f"Email sent to {to_email}")
     except Exception as e:
         print(f"Failed to send email to {to_email}: {e}")
+

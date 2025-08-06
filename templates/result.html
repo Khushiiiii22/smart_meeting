@@ -14,28 +14,23 @@
       line-height: 1.6;
       font-size: 1rem;
     }
-    h1, h2 {
-      font-family: Georgia, 'Times New Roman', Times, serif;
-      color: #343a40;
-      margin-bottom: 8px;
-      font-weight: 700;
-    }
     h1 {
       font-size: 2.2rem;
       margin-bottom: 16px;
       border-bottom: 2px solid #6c757d;
       padding-bottom: 6px;
+      font-weight: 700;
+      color: #343a40;
     }
     .container {
       max-width: 900px;
       margin: 0 auto;
       background-color: white;
       padding: 30px 30px 40px 30px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       border-radius: 8px;
     }
     label {
-      font-family: Georgia, 'Times New Roman', Times, serif;
       font-weight: 600;
       display: block;
       margin-top: 20px;
@@ -56,18 +51,8 @@
       transition: border-color 0.3s ease;
       color: #212529;
     }
-    textarea:focus {
-      outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
-    }
-    .textarea-large {
-      min-height: 240px;
-      font-family: "Courier New", Courier, monospace; /* monospace for transcription */
-      white-space: pre-wrap;
-      font-size: 1rem;
-      color: #212529;
-    }
+    textarea:focus { border-color: #007bff; box-shadow: 0 0 6px rgba(0,123,255,0.3); }
+    .textarea-large { min-height: 240px; font-family: "Courier New", Courier, monospace; white-space: pre-wrap;}
     .back-link {
       display: inline-block;
       margin-top: 30px;
@@ -75,31 +60,74 @@
       color: #007bff;
       text-decoration: none;
       font-weight: 600;
-      font-family: Georgia, 'Times New Roman', Times, serif;
       transition: color 0.2s ease;
     }
-    .back-link:hover,
-    .back-link:focus {
+    .back-link:hover, .back-link:focus {
       color: #0056b3;
       text-decoration: underline;
     }
-    fieldset {
-      margin-top: 30px;
-      border: 1px solid #ced4da;
-      padding: 15px 20px;
-      border-radius: 6px;
-      font-family: Georgia, 'Times New Roman', Times, serif;
-      color: #343a40;
+    .form-group { margin-bottom: 25px; }
+    .recipient-area {
+      margin-top: 32px;
+      border: 1.5px solid #ced4da;
+      border-radius: 7px;
+      padding: 16px 14px 10px 14px;
+      background: #f2f6fa;
     }
-    legend {
+    .recipient-area legend {
       font-weight: 700;
-      font-size: 1.2rem;
-      color: #343a40;
+      font-size: 1.13rem;
     }
-    input[type="checkbox"] {
-      margin-right: 10px;
+    .recipient-list {
+      margin: 0; padding: 0;
+      list-style: none;
+    }
+    .recipient-entry {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 9px;
+    }
+    .recipient-entry input[type="email"] {
+      flex: 1 1 230px;
+      padding: 6px 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .recipient-entry select {
+      flex: 0 0 122px;
+      padding: 5px 9px;
+    }
+    .recipient-entry button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 9px;
+      font-size: 0.97rem;
       cursor: pointer;
+      margin-left: 3px;
     }
+    .recipient-entry button:hover, .recipient-entry button:focus {
+      background-color: #bb2533;
+    }
+    #add-recipient-btn {
+      margin-top: 8px;
+      background-color: #007bff;
+      color: white;
+      font-weight: 700;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 15px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+    #add-recipient-btn:hover, #add-recipient-btn:focus {
+      background-color: #0056b3;
+    }
+
     button[type="submit"] {
       margin-top: 30px;
       background-color: #007bff;
@@ -110,67 +138,80 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 1.1rem;
-      font-family: Georgia, 'Times New Roman', Times, serif;
-      transition: background-color 0.3s ease;
     }
     button[type="submit"]:hover,
     button[type="submit"]:focus {
       background-color: #0056b3;
     }
     @media (max-width: 600px) {
-      body {
-        padding: 20px 15px;
-      }
-      .container {
-        padding: 20px 15px 30px 15px;
-      }
+      body { padding: 20px 15px; }
+      .container { padding: 20px 7px 30px 7px;}
+      .recipient-entry { flex-direction: column; gap: 4px;}
+      .recipient-entry button { margin-left: 0; align-self: flex-start; }
     }
   </style>
 </head>
 <body>
-  <div class="container" role="main" aria-label="Meeting Summary and Minutes">
-    <h1>Meeting Summary & Minutes</h1>
-
-    <form method="POST" action="{{ url_for('finalize_and_share') }}">
+<div class="container" role="main" aria-label="Meeting Summary and Minutes">
+  <h1>Meeting Summary & Minutes</h1>
+  <form method="POST" action="{{ url_for('finalize_and_share') }}">
+    <input type="hidden" name="mom_json" value='{{ mom_json | tojson | safe }}'>
+    <input type="hidden" name="summary" value="{{ summary|e }}">
+    <div class="form-group">
       <label for="mom">Minutes of Meeting</label>
-      <input type="hidden" name="mom_json" value='{{ mom_json | tojson | safe }}'>
-
-      <!-- Hidden input for raw JSON MoM dict -->
-
       <textarea id="mom" class="textarea-large" readonly name="mom">{{ mom }}</textarea>
-
+    </div>
+    <div class="form-group">
       <label for="summary">Summary</label>
       <textarea id="summary" rows="6" readonly>{{ summary }}</textarea>
-
+    </div>
+    <div class="form-group">
       <label for="transcription">Original Transcription (Editable)</label>
       <textarea id="transcription" class="textarea-large" name="transcription">{{ transcription }}</textarea>
+    </div>
+    <fieldset class="recipient-area">
+      <legend>Add Recipients (send MoM to…)</legend>
+      <ul id="recipient-list" class="recipient-list">
+        <!-- Initial recipient row (by default one row) -->
+        <li class="recipient-entry">
+          <input type="email" name="recipient_email" placeholder="Recipient Email" required>
+          <select name="recipient_type">
+            <option value="internal">Internal</option>
+            <option value="external">External</option>
+          </select>
+          <button type="button" onclick="removeRow(this)" tabindex="0" aria-label="Remove recipient">&times;</button>
+        </li>
+      </ul>
+      <button id="add-recipient-btn" type="button" onclick="addRow()">+ Add Recipient</button>
+    </fieldset>
+    <button type="submit">Share MoM</button>
+  </form>
+  <a class="back-link" href="{{ url_for('upload_and_transcribe') }}" aria-label="Upload another file">
+    &larr; Upload another file
+  </a>
+</div>
 
-      <fieldset>
-        <legend>Select Internal Members to send ORIGINAL MoM</legend>
-        {% for email in internal_members %}
-          <label>
-            <input type="checkbox" name="internal_members" value="{{ email }}" checked>
-            {{ email }}
-          </label><br />
-        {% endfor %}
-      </fieldset>
-
-      <fieldset>
-        <legend>Select Non-Members to send CUSTOMIZED MoM</legend>
-        {% for email in non_members %}
-          <label>
-            <input type="checkbox" name="non_members" value="{{ email }}" checked>
-            {{ email }}
-          </label><br />
-        {% endfor %}
-      </fieldset>
-
-      <button type="submit">Share MoM</button>
-    </form>
-
-    <a class="back-link" href="{{ url_for('upload_and_transcribe') }}" aria-label="Upload another file">
-      &larr; Upload another file
-    </a>
-  </div>
+<script>
+function addRow() {
+  const li = document.createElement('li');
+  li.className = "recipient-entry";
+  li.innerHTML = `
+    <input type="email" name="recipient_email" placeholder="Recipient Email" required>
+    <select name="recipient_type">
+      <option value="internal">Internal</option>
+      <option value="external">External</option>
+    </select>
+    <button type="button" onclick="removeRow(this)" tabindex="0" aria-label="Remove recipient">&times;</button>
+  `;
+  document.getElementById('recipient-list').appendChild(li);
+}
+function removeRow(btn) {
+  const entry = btn.closest('.recipient-entry');
+  if (document.querySelectorAll('.recipient-entry').length > 1) {
+    entry.remove();
+  }
+  // else do not remove last (at least one recipient must be present)
+}
+</script>
 </body>
 </html>
