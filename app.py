@@ -2,6 +2,8 @@ from flask import Flask, request, render_template, redirect, url_for, flash
 import os
 import time
 import json
+import copy
+
 from utils.stt import get_transcript
 from utils.nlp import generate_summary, generate_minutes_of_meeting
 from utils.nlp import transcribe_audio, format_transcript
@@ -9,7 +11,6 @@ from utils.email_utils import send_email
 from utils.format_utils import format_mom_as_markdown
 from utils.pdf_utils import create_mom_pdf
 from db.supabase import add_meeting, add_meeting_minute, add_meeting_attendee
-
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -22,12 +23,12 @@ if not os.path.exists(UPLOAD_FOLDER):
 @app.route('/', methods=['GET', 'POST'])
 def upload_and_transcribe():
     """
-    Upload Zoom video file.
+    Upload Zoom video/audio file and generate transcript immediately.
     """
     if request.method == 'POST':
         if 'file' not in request.files or request.files['file'].filename == '':
-            flash("Please select a video file to upload.", 'error')
-            return render_template('upload_video.html')
+            flash("Please select a video or audio file to upload.", 'error')
+            return render_template('transcribe.html')
 
         file = request.files['file']
         filename = file.filename.replace(' ', '_')
@@ -37,76 +38,86 @@ def upload_and_transcribe():
             file.save(local_path)
         except Exception as e:
             flash(f"Failed to save the file: {e}", 'error')
-            return render_template('upload_video.html')
+            return render_template('transcribe.html')
 
-        flash("Video uploaded successfully! Now you can generate the transcript.", "success")
-        # Pass the uploaded file path for next step if you want
-        return render_template('upload_video.html', uploaded_video=filename)
+        transcription = get_transcript(local_path)
+        if not transcription:
+            flash("Transcription failed. Please try again.", 'error')
+            return render_template('transcribe.html')
 
-    return render_template('upload_video.html')
+        try:
+            transcript_text, transcript_json = transcribe_audio(local_path)
+            formatted_transcript = format_transcript(transcript_json)
+        except Exception as e:
+            flash(f"Error processing transcription data: {e}", 'error')
+            return render_template('transcribe.html')
+
+        # Pass the uploaded video filename along for downstream use
+        return render_template(
+            'edit_transcription.html',
+            transcription=formatted_transcript,
+            uploaded_video=filename
+        )
+
+    return render_template('transcribe.html')
 
 
-@app.route('/generate', methods=['POST'])
-def generate_transcript():
+@app.route('/generate_mom', methods=['POST'])
+def generate_mom():
     """
-    Generate transcript from uploaded Zoom video file.
+    Receive edited transcription and generate/display Meeting Summary & Minutes.
     """
-    filename = request.form.get('uploaded_video')
-    if not filename:
-        flash("No uploaded video specified. Please upload a video first.", 'error')
-        return redirect(url_for('upload_zoom_video'))
+    transcription = request.form.get('transcription', '').strip()
+    uploaded_video = request.form.get('uploaded_video', '').strip()
 
-    local_path = os.path.join(UPLOAD_FOLDER, filename)
-    if not os.path.exists(local_path):
-        flash("Uploaded video file not found. Please upload again.", 'error')
-        return redirect(url_for('upload_zoom_video'))
-
-    # Generate transcription using your existing utils
-    transcription = get_transcript(local_path)
     if not transcription:
-        flash("Transcription failed. Please try again.", 'error')
-        return redirect(url_for('upload_zoom_video'))
+        flash("Transcription cannot be empty.", 'error')
+        return redirect(url_for('upload_and_transcribe'))
 
-    # Optionally get more structured transcript info
-    transcript_text, transcript_json = transcribe_audio(local_path)
-    formatted_transcript = format_transcript(transcript_json)
+    # Generate summary and minutes of meeting using your NLP utils
+    prompt = "Please summarize the following transcription:"
+    summary = generate_summary(transcription, prompt)
+    mom_dict = generate_minutes_of_meeting(transcription)
+    mom_text = format_mom_as_markdown(mom_dict)
+    print("Formatted mom_text:", repr(mom_text))
 
-    print("transcript_text:", repr(transcript_text))
-    print("transcript_json:", transcript_json)
-    print("formatted_transcript:", repr(formatted_transcript))
-
-    # Render page where user can edit transcription and continue to generate MoM
-    return render_template('edit_transcription.html', transcription=formatted_transcript)
+    # Pass mom_dict (dict) directly for template to serialize using |tojson
+    return render_template('result.html',
+                           transcription=transcription,
+                           summary=summary,
+                           mom=mom_text,
+                           mom_json=mom_dict,     # pass dict, NOT JSON string
+                           uploaded_video=uploaded_video)
 
 
 @app.route('/finalize', methods=['POST'])
 def finalize_and_share():
     """
-    Finalize Minutes of Meeting and share via email and save to database.
-    (Same as your existing finalize implementation)
+    Receive finalized MoM, send emails, save data, and show success page.
     """
     transcription = request.form.get('transcription', '').strip()
     mom_text = request.form.get('mom', '').strip()
     mom_json_str = request.form.get('mom_json', '')
     summary = request.form.get('summary', '').strip()
+    uploaded_video = request.form.get('uploaded_video', '').strip()  # If you want to keep track
 
-    # Parse the MoM JSON
+    # Parse the MoM JSON (exactly once)
     try:
         mom_data_dict = json.loads(mom_json_str) if mom_json_str else {}
     except Exception as e:
         flash(f"Failed to parse Minutes of Meeting JSON: {e}", 'error')
-        return redirect(url_for('upload_zoom_video'))
+        return redirect(url_for('upload_and_transcribe'))
 
     if not mom_text:
         flash("Minutes of Meeting cannot be empty.", 'error')
-        return redirect(url_for('upload_zoom_video'))
+        return redirect(url_for('upload_and_transcribe'))
 
     recipient_emails = request.form.getlist('recipient_email')
     recipient_types = request.form.getlist('recipient_type')
 
     if not recipient_emails or not recipient_types or len(recipient_emails) != len(recipient_types):
         flash("Please provide valid recipients (email and type for each).", 'error')
-        return redirect(url_for('upload_zoom_video'))
+        return redirect(url_for('upload_and_transcribe'))
 
     internal_members = []
     non_members = []
@@ -126,7 +137,7 @@ def finalize_and_share():
 
     if not internal_members and not non_members:
         flash("Please select at least one recipient.", 'error')
-        return redirect(url_for('upload_zoom_video'))
+        return redirect(url_for('upload_and_transcribe'))
 
     # Generate PDFs
     pdf_buffer_internal = create_mom_pdf(mom_data_dict)
@@ -190,7 +201,6 @@ def finalize_and_share():
 
 
 def customize_mom_for_non_members(mom_dict):
-    import copy
     redacted = copy.deepcopy(mom_dict)
     sensitive_keywords = ['confidential', 'internal', 'salary', 'budget']
 

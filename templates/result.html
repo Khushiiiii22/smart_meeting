@@ -157,6 +157,7 @@
   <form method="POST" action="{{ url_for('finalize_and_share') }}">
     <input type="hidden" name="mom_json" value='{{ mom_json | tojson | safe }}'>
     <input type="hidden" name="summary" value="{{ summary|e }}">
+     <input type="hidden" name="uploaded_video" value="{{ uploaded_video }}">
     <div class="form-group">
       <label for="mom">Minutes of Meeting</label>
       <textarea id="mom" class="textarea-large" readonly name="mom">{{ mom }}</textarea>

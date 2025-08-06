@@ -1,110 +1,111 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Edit Transcription</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #212529;
-      margin: 0;
-      padding: 20px 40px;
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      background-color: white;
-      padding: 30px 30px 40px 30px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-    }
-
-    h1, h2 {
-      color: #343a40;
-      margin-bottom: 20px;
-      font-weight: 600;
-    }
-
-    label {
-      font-weight: 600;
-      display: block;
-      margin-bottom: 8px;
-      font-size: 1.1rem;
-      color: #495057;
-    }
-
-    textarea {
-      width: 100%;
-      padding: 12px 14px;
-      font-size: 1rem;
-      font-family: 'Consolas', 'Courier New', monospace, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      border: 1.8px solid #ced4da;
-      border-radius: 6px;
-      resize: vertical;
-      min-height: 320px;
-      box-sizing: border-box;
-      transition: border-color 0.3s ease;
-      white-space: pre-wrap; /* preserves line breaks and whitespace */
-      overflow-wrap: break-word;
-    }
-
-    textarea:focus {
-      outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
-    }
-
-    button {
-      margin-top: 24px;
-      background-color: #007bff;
-      color: white;
-      font-weight: 600;
-      font-size: 1.1rem;
-      padding: 12px 25px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      width: 100%;
-      max-width: 320px;
-      display: block;
-    }
-
-    button:hover, button:focus {
-      background-color: #0056b3;
-    }
-
-    @media (max-width: 600px) {
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Transcription</title>
+    <style>
       body {
-        padding: 20px 15px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+        color: #212529;
+        margin: 0;
+        padding: 20px 40px;
+        line-height: 1.6;
       }
-      .container {
-        padding: 20px 15px 30px 15px;
-      }
-      textarea {
-        min-height: 240px;
-      }
-      button {
-        max-width: 100%;
-      }
-    }
-  </style>
-</head>
-<body>
-  <main class="container" role="main" aria-label="Edit transcribed text">
-    <h2>Edit the Transcription</h2>
-    <form method="POST" action="{{ url_for('generate_mom_summary') }}" novalidate>
-      <label for="transcription-textarea">Editable Transcription Text</label>
-      <textarea name="transcription" spellcheck="false" autocomplete="off" style="white-space: pre-wrap;">{{ transcription }}</textarea>
 
-      <button type="submit" aria-label="Generate Minutes of Meeting and Summary" title="Generate Minutes of Meeting and Summary">
-        Generate Minutes of Meeting &amp; Summary
-      </button>
-    </form>
-  </main>
-</body>
-</html>
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 30px 30px 40px 30px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      h1, h2 {
+        color: #343a40;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 8px;
+        font-size: 1.1rem;
+        color: #495057;
+      }
+
+      textarea {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 1rem;
+        font-family: 'Consolas', 'Courier New', monospace, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        border: 1.8px solid #ced4da;
+        border-radius: 6px;
+        resize: vertical;
+        min-height: 320px;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+        white-space: pre-wrap; /* preserves line breaks and whitespace */
+        overflow-wrap: break-word;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+      }
+
+      button {
+        margin-top: 24px;
+        background-color: #007bff;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 100%;
+        max-width: 320px;
+        display: block;
+      }
+
+      button:hover, button:focus {
+        background-color: #0056b3;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 20px 15px;
+        }
+        .container {
+          padding: 20px 15px 30px 15px;
+        }
+        textarea {
+          min-height: 240px;
+        }
+        button {
+          max-width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container" role="main" aria-label="Edit transcribed text">
+      <h2>Edit the Transcription</h2>
+        <form method="POST" action="{{ url_for('generate_mom') }}" novalidate>
+
+        <label for="transcription-textarea">Editable Transcription Text</label>
+        <textarea name="transcription" spellcheck="false" autocomplete="off" style="white-space: pre-wrap;">{{ transcription }}</textarea>
+        <input type="hidden" name="uploaded_video" value="{{ uploaded_video }}">
+        <button type="submit" aria-label="Generate Minutes of Meeting and Summary" title="Generate Minutes of Meeting and Summary">
+          Generate Minutes of Meeting &amp; Summary
+        </button>
+      </form>
+    </main>
+  </body>
+  </html>
