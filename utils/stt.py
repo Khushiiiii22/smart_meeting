@@ -4,7 +4,9 @@ import config
 from typing import Optional
 
 
-ASSEMBLYAI_API_KEY = config.ASSEMBLYAI_API_KEY
+ASSEMBLYAI_API_KEY = os.environ.get("ASSEMBLYAI_API_KEY")
+if not ASSEMBLYAI_API_KEY:
+    raise ValueError("ASSEMBLYAI_API_KEY not found in environment variables")
 UPLOAD_ENDPOINT = "https://api.assemblyai.com/v2/upload"
 TRANSCRIPT_ENDPOINT = "https://api.assemblyai.com/v2/transcript"
 HEADERS = {"authorization": ASSEMBLYAI_API_KEY}
