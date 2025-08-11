@@ -7,6 +7,7 @@ flask==2.2.2
 werkzeug==2.3.7
 assemblyai>=0.40.0,<0.43.0
 python-dotenv>=0.21.0,<1.0.0
+reportlab>=3.6.0,<4.0.0
 
 google-cloud-storage==2.5.0
 google-cloud-aiplatform==1.104.0
@@ -20,6 +21,7 @@ google-cloud-vision==3.0.0
 google-cloud-texttospeech==2.10.0
 google-cloud-speech==2.16.0
 google-cloud-dialogflow>=2.30.0,<3.0.0
+
 
 
 
