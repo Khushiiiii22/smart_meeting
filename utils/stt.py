@@ -1,6 +1,7 @@
 import requests
 import time
 import config
+from typing import Optional
 
 
 ASSEMBLYAI_API_KEY = config.ASSEMBLYAI_API_KEY
@@ -40,7 +41,8 @@ def request_transcript(upload_url: str) -> str:
     return transcript_id
 
 
-def poll_transcription(transcript_id: str, poll_interval: int = 10, timeout: int = 600) -> dict | None:
+
+def poll_transcription(transcript_id: str, poll_interval: int = 10, timeout: int = 600) -> Optional[dict]:
     """
     Poll transcription status every poll_interval seconds until complete or failed.
     Returns the full JSON response on success, None on failure or timeout.
@@ -90,7 +92,7 @@ def format_transcript_with_speakers(transcript_json: dict) -> str:
     return "\n".join(lines)
 
 
-def get_transcript(file_path: str) -> str | None:
+def get_transcript(file_path: str) -> Optional[str]:
     """
     High-level function to get speaker-labeled transcription text from a local audio file.
     Returns formatted transcript string or None on failure.

@@ -3,6 +3,7 @@ import assemblyai as aai
 import config
 import os
 from google.genai import Client
+from typing import Optional
 
 # Optionally set the GOOGLE_API_KEY environment variable here from your config:
 # Uncomment if you want to set from config.py instead of your shell environment.
@@ -89,7 +90,7 @@ def format_transcript(json_response):
 
     return "\n".join(lines)
 
-def generate_summary(transcript: str, prompt: str) -> str | None:
+def generate_summary(transcript: str, prompt: str) -> Optional[str]:
     try:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
@@ -102,7 +103,7 @@ def generate_summary(transcript: str, prompt: str) -> str | None:
 
 
 
-def generate_minutes_of_meeting(transcript: str) -> dict | None:
+def generate_minutes_of_meeting(transcript: str) -> Optional[dict]:
     """
     Generate detailed minutes of meeting (MoM) JSON from the given transcript.
     Returns parsed JSON dictionary or None on failure.
