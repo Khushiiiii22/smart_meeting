@@ -10,10 +10,12 @@ from typing import Optional
 # os.environ["GOOGLE_API_KEY"] = config.GEMINI_API_KEY
 
 # Initialize AssemblyAI API key
-aai.settings.api_key = config.ASSEMBLYAI_API_KEY
+ASSEMBLYAI_API_KEY = os.environ.get("ASSEMBLYAI_API_KEY")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-# Initialize Google GenAI client (reads GOOGLE_API_KEY from environment)
-client = Client(api_key=config.GEMINI_API_KEY)
+aai.settings.api_key = ASSEMBLYAI_API_KEY
+client = Client(api_key=GEMINI_API_KEY)
+
 
 
 def transcribe_audio(local_file_path: str):
