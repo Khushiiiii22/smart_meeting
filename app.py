@@ -12,10 +12,6 @@ from utils.format_utils import format_mom_as_markdown
 from utils.pdf_utils import create_mom_pdf
 from db.supabase import add_meeting, add_meeting_minute, add_meeting_attendee
 
-# Optional: If you have an email template generator or use flask template for emails
-# from utils.email_template import TemplateGenerator
-# template_generator = TemplateGenerator()
-
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
@@ -26,9 +22,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_and_transcribe():
-    """
-    Upload Zoom video/audio file and generate transcript immediately.
-    """
+    """Upload Zoom video/audio file and generate transcript immediately."""
     if request.method == 'POST':
         if 'file' not in request.files or request.files['file'].filename == '':
             flash("Please select a video or audio file to upload.", 'error')
@@ -56,7 +50,6 @@ def upload_and_transcribe():
             flash(f"Error processing transcription data: {e}", 'error')
             return render_template('transcribe.html')
 
-        # Pass uploaded filename for downstream use
         return render_template(
             'edit_transcription.html',
             transcription=formatted_transcript,
@@ -68,9 +61,7 @@ def upload_and_transcribe():
 
 @app.route('/generate_mom', methods=['POST'])
 def generate_mom():
-    """
-    Receive edited transcription and generate/display Meeting Summary & Minutes.
-    """
+    """Receive edited transcription and generate/display Meeting Summary & Minutes."""
     transcription = request.form.get('transcription', '').strip()
     uploaded_video = request.form.get('uploaded_video', '').strip()
 
@@ -78,36 +69,32 @@ def generate_mom():
         flash("Transcription cannot be empty.", 'error')
         return redirect(url_for('upload_and_transcribe'))
 
-    # Generate summary and minutes using your NLP utils
     prompt = "Please summarize the following transcription:"
     summary = generate_summary(transcription, prompt)
     mom_dict = generate_minutes_of_meeting(transcription)
     mom_text = format_mom_as_markdown(mom_dict)
 
-    # Debug output (can remove in production)
     app.logger.debug(f"Formatted mom_text: {repr(mom_text)}")
 
-    # Pass mom_dict (dict) to template for serialization with |tojson filter
-    return render_template('result.html',
-                           transcription=transcription,
-                           summary=summary,
-                           mom=mom_text,
-                           mom_json=mom_dict,  # pass dict, NOT JSON string
-                           uploaded_video=uploaded_video)
+    return render_template(
+        'result.html',
+        transcription=transcription,
+        summary=summary,
+        mom=mom_text,
+        mom_json=mom_dict,
+        uploaded_video=uploaded_video
+    )
 
 
 @app.route('/finalize', methods=['POST'])
 def finalize_and_share():
-    """
-    Receive finalized MoM, send emails, save data, and show success page.
-    """
+    """Receive finalized MoM, send emails, save data, and show success page."""
     transcription = request.form.get('transcription', '').strip()
     mom_text = request.form.get('mom', '').strip()
     mom_json_str = request.form.get('mom_json', '')
     summary = request.form.get('summary', '').strip()
     uploaded_video = request.form.get('uploaded_video', '').strip()
 
-    # Parse the MoM JSON string exactly once
     try:
         mom_data_dict = json.loads(mom_json_str) if mom_json_str else {}
     except Exception as e:
@@ -150,34 +137,22 @@ def finalize_and_share():
     customized_mom_dict = customize_mom_for_non_members(mom_data_dict)
     pdf_buffer_non_members = create_mom_pdf(customized_mom_dict)
 
-    html_body = render_template(
-        'email_mom.html',
-        meeting_topic=mom_data_dict.get('title', 'Meeting'),
-        meeting_date=mom_data_dict.get('date', 'TBD'),
-        meeting_time=mom_data_dict.get('time', 'TBD'),
-        duration=mom_data_dict.get('duration', '60 minutes'),
-        speaker_name=mom_data_dict.get('speaker', 'TBD'),
-        summary=summary,
-        mom_text=mom_text,
-        meeting_link=mom_data_dict.get('meeting_link', '')
-    )
-
+    # Send to internal members - NO HTML template, plain text only
     for email in internal_members:
         send_email(
             to_email=email,
             subject="Minutes of Meeting",
             body="Please find the attached Minutes of Meeting.",
-            html_body=html_body,  # Uncomment if using HTML template
             pdf_buffer=pdf_buffer_internal
         )
-        pdf_buffer_internal.seek(0)  # Reset buffer position for next email
+        pdf_buffer_internal.seek(0)
 
+    # Send to non-members - NO HTML template
     for email in non_members:
         send_email(
             to_email=email,
             subject="Customized Minutes of Meeting",
             body="Please find the customized Minutes of Meeting attached.",
-            # html_body=email_template['content'],  # Uncomment if using HTML template
             pdf_buffer=pdf_buffer_non_members
         )
         pdf_buffer_non_members.seek(0)
@@ -222,6 +197,7 @@ def finalize_and_share():
 
 
 def customize_mom_for_non_members(mom_dict):
+    """Remove sensitive content for non-members."""
     redacted = copy.deepcopy(mom_dict)
     sensitive_keywords = ['confidential', 'internal', 'salary', 'budget']
 
