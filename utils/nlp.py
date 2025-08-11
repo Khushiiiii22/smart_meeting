@@ -1,22 +1,28 @@
+from dotenv import load_dotenv
+import os
 import json
 import assemblyai as aai
-import config
-import os
 from google.genai import Client
 from typing import Optional
 
-# Optionally set the GOOGLE_API_KEY environment variable here from your config:
-# Uncomment if you want to set from config.py instead of your shell environment.
-# os.environ["GOOGLE_API_KEY"] = config.GEMINI_API_KEY
+# Load environment variables from .env locally; Render reads from its own env store
+load_dotenv()
 
-# Initialize AssemblyAI API key
+# Read API keys
 ASSEMBLYAI_API_KEY = os.environ.get("ASSEMBLYAI_API_KEY")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
+# Fail fast if keys are missing
+missing_vars = [var for var, val in {
+    "ASSEMBLYAI_API_KEY": ASSEMBLYAI_API_KEY,
+    "GEMINI_API_KEY": GEMINI_API_KEY
+}.items() if not val]
+if missing_vars:
+    raise ValueError(f"Missing environment variables: {', '.join(missing_vars)}")
+
+# Initialize SDKs
 aai.settings.api_key = ASSEMBLYAI_API_KEY
 client = Client(api_key=GEMINI_API_KEY)
-
-
 
 def transcribe_audio(local_file_path: str):
     """
@@ -31,13 +37,13 @@ def transcribe_audio(local_file_path: str):
         print("Full transcript text:")
         print(transcript.text)
 
-        # Build transcript_json dict
+        # Build transcript JSON
         transcript_json = {
             "text": transcript.text,
             "segments": []
         }
 
-        # Use utterances if available (preferred)
+        # Use utterances if available
         if hasattr(transcript, 'utterances') and transcript.utterances:
             print("Using utterances:")
             for utt in transcript.utterances:
@@ -47,7 +53,7 @@ def transcribe_audio(local_file_path: str):
                     "start": getattr(utt, "start", 0),
                     "text": utt.text
                 })
-        # Fallback to segments if utterances not present
+        # Fallback to segments
         elif hasattr(transcript, "segments") and transcript.segments:
             print("Using segments:")
             for seg in transcript.segments:
@@ -77,7 +83,6 @@ def format_transcript(json_response):
 
     segments = json_response.get('segments')
     if not segments:
-        # Return plain text with a note so user sees something, even if no diarization.
         return "(No speaker diarization data available)\n\n" + json_response.get('text', '')
 
     lines = []
@@ -92,6 +97,7 @@ def format_transcript(json_response):
 
     return "\n".join(lines)
 
+
 def generate_summary(transcript: str, prompt: str) -> Optional[str]:
     try:
         response = client.models.generate_content(
@@ -104,11 +110,9 @@ def generate_summary(transcript: str, prompt: str) -> Optional[str]:
         return None
 
 
-
 def generate_minutes_of_meeting(transcript: str) -> Optional[dict]:
     """
     Generate detailed minutes of meeting (MoM) JSON from the given transcript.
-    Returns parsed JSON dictionary or None on failure.
     """
     prompt = (
         "Generate detailed Minutes of Meeting (MoM) from the following transcript. "
@@ -141,7 +145,6 @@ def generate_minutes_of_meeting(transcript: str) -> Optional[dict]:
         return None
 
 
-# Optional standalone test code (only runs if this file executed directly)
 if __name__ == "__main__":
     local_audio_path = "path/to/your/local/audiofile.mp3"
 
