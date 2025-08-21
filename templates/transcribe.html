@@ -3,136 +3,163 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Upload Audio/Video for Transcription</title>
+  <title>Secure File Upload – Transcription Service</title>
   <style>
+    /* --- Base Styling --- */
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
+      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
       color: #212529;
       margin: 0;
-      padding: 20px 40px;
+      padding: 40px 20px;
       line-height: 1.6;
     }
 
     .container {
       max-width: 600px;
       margin: 0 auto;
-      background-color: white;
-      padding: 30px 30px 40px 30px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
+      background-color: #ffffff;
+      padding: 40px 40px 50px 40px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      border-radius: 12px;
       text-align: center;
     }
 
     h2 {
-      color: #343a40;
+      color: #1a1d21;
       margin-bottom: 24px;
       font-weight: 600;
-      font-size: 1.8rem;
+      font-size: 1.9rem;
+      letter-spacing: -0.3px;
     }
 
+    p.subtitle {
+      font-size: 0.95rem;
+      color: #6c757d;
+      margin-bottom: 32px;
+    }
+
+    /* --- Form Styling --- */
     form {
       display: flex;
       flex-direction: column;
       align-items: center;
+      width: 100%;
     }
 
     input[type="file"] {
       width: 100%;
-      padding: 10px 12px;
       font-size: 1rem;
-      border: 1.8px solid #ced4da;
-      border-radius: 6px;
-      margin-bottom: 20px;
+      padding: 14px 16px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 8px;
+      background-color: #fafafa;
+      margin-bottom: 24px;
       cursor: pointer;
-      box-sizing: border-box;
-      transition: border-color 0.3s ease;
+      transition: all 0.25s ease;
+    }
+
+    input[type="file"]:hover {
+      border-color: #4a90e2;
+      background-color: #fdfdfd;
     }
 
     input[type="file"]:focus {
       outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+      background-color: #ffffff;
     }
 
+    /* --- Button Styling --- */
     button {
-      background-color: #007bff;
-      color: white;
+      display: inline-block;
+      background: linear-gradient(135deg, #4a90e2, #357abd);
+      color: #ffffff;
       font-weight: 600;
-      font-size: 1.1rem;
-      padding: 12px 25px;
+      font-size: 1.05rem;
+      padding: 14px 28px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background 0.3s ease, transform 0.1s ease;
       width: 100%;
       max-width: 320px;
     }
 
-    button:hover, button:focus {
-      background-color: #0056b3;
+    button:hover {
+      background: linear-gradient(135deg, #357abd, #2f5fa7);
+      transform: translateY(-2px);
     }
 
+    button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+    }
+
+    /* --- Flash Messages --- */
     ul {
       list-style-type: none;
       padding-left: 0;
-      margin-bottom: 20px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+      margin-bottom: 24px;
       text-align: left;
     }
 
     li {
-      padding: 8px 12px;
-      border-radius: 4px;
-      margin-bottom: 8px;
-      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+      font-weight: 500;
     }
 
     li.error {
-      background-color: #f8d7da;
-      color: #842029;
+      background-color: #fdecea;
+      color: #b42f2f;
       border: 1px solid #f5c2c7;
     }
 
     li.success {
-      background-color: #d1e7dd;
-      color: #0f5132;
-      border: 1px solid #badbcc;
+      background-color: #e7f6ec;
+      color: #256d3c;
+      border: 1px solid #b6e2c6;
     }
 
+    /* --- Responsive --- */
     @media (max-width: 480px) {
       body {
-        padding: 20px 15px;
+        padding: 25px 15px;
       }
       .container {
-        padding: 20px 15px 30px 15px;
+        padding: 25px 20px 35px 20px;
       }
-
-      button {
-        max-width: 100%;
+      h2 {
+        font-size: 1.5rem;
       }
     }
   </style>
 </head>
 <body>
   <main class="container" role="main" aria-label="Upload Audio and Video for Transcription">
-    <h2>Upload Your Audio or Video File for Transcription</h2>
+    <h2>Upload File for Transcription</h2>
+    <p class="subtitle">Submit your audio or video file securely for professional transcription.</p>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <ul>
-        {% for category, message in messages %}
-          <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
         </ul>
       {% endif %}
     {% endwith %}
 
     <form method="post" enctype="multipart/form-data" novalidate>
       <input type="file" name="file" accept="audio/*,video/*" required aria-required="true" aria-label="Select audio or video file" />
-      <button type="submit" aria-label="Upload and start transcription">Upload and Transcribe</button>
+      <button type="submit" aria-label="Upload and start transcription">
+        Upload & Transcribe
+      </button>
     </form>
   </main>
 </body>

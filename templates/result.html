@@ -6,77 +6,79 @@
   <title>Meeting Summary & Minutes</title>
   <style>
     body {
-      font-family: Georgia, 'Times New Roman', Times, serif;
-      background-color: #f8f9fa;
-      color: #212529;
+      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6fa;
+      color: #1d2636;
       margin: 0;
-      padding: 20px 40px;
-      line-height: 1.6;
+      padding: 40px 0;
       font-size: 1rem;
-    }
-    h1 {
-      font-size: 2.2rem;
-      margin-bottom: 16px;
-      border-bottom: 2px solid #6c757d;
-      padding-bottom: 6px;
-      font-weight: 700;
-      color: #343a40;
+      line-height: 1.68;
     }
     .container {
-      max-width: 900px;
+      max-width: 950px;
       margin: 0 auto;
-      background-color: white;
-      padding: 30px 30px 40px 30px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      border-radius: 8px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(50,70,120,0.09);
+      border: 1.5px solid #e5e8ed;
+      padding: 48px 46px 56px 46px;
+    }
+    h1 {
+      font-size: 2.05rem;
+      margin-bottom: 22px;
+      font-weight: 700;
+      color: #233164;
+      letter-spacing: -0.5px;
+      border-bottom: 1.5px solid #c7d0df;
+      padding-bottom: 13px;
     }
     label {
-      font-weight: 600;
       display: block;
-      margin-top: 20px;
-      margin-bottom: 6px;
-      font-size: 1.1rem;
-      color: #495057;
+      font-weight: 600;
+      font-size: 1.13rem;
+      color: #283347;
+      margin-bottom: 7px;
+      margin-top: 19px;
+    }
+    .form-group {
+      margin-bottom: 34px;
+      text-align: left;
     }
     textarea {
       width: 100%;
-      padding: 12px 14px;
-      font-size: 1rem;
-      font-family: Georgia, 'Times New Roman', Times, serif;
-      border: 1.8px solid #ced4da;
-      border-radius: 6px;
+      font-size: 1.07rem;
+      font-family: 'Fira Mono', 'Consolas', 'Courier New', monospace;
+      padding: 16px 15px 13px 16px;
+      background: #f6f8fa;
+      border: 1.5px solid #d3d9df;
+      border-radius: 9px;
       resize: vertical;
-      min-height: 100px;
+      min-height: 120px;
       box-sizing: border-box;
-      transition: border-color 0.3s ease;
-      color: #212529;
+      color: #314159;
+      margin-bottom: 8px;
+      transition: border-color 0.18s, box-shadow 0.25s;
     }
-    textarea:focus { border-color: #007bff; box-shadow: 0 0 6px rgba(0,123,255,0.3); }
-    .textarea-large { min-height: 240px; font-family: "Courier New", Courier, monospace; white-space: pre-wrap;}
-    .back-link {
-      display: inline-block;
-      margin-top: 30px;
-      font-size: 1.1rem;
-      color: #007bff;
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.2s ease;
+    .textarea-large { min-height: 220px; font-size: 1.07rem; }
+    textarea:focus {
+      border-color: #357abd;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, .15);
+      outline: none;
+      background: #fff;
     }
-    .back-link:hover, .back-link:focus {
-      color: #0056b3;
-      text-decoration: underline;
-    }
-    .form-group { margin-bottom: 25px; }
     .recipient-area {
-      margin-top: 32px;
-      border: 1.5px solid #ced4da;
-      border-radius: 7px;
-      padding: 16px 14px 10px 14px;
-      background: #f2f6fa;
+      margin-top: 38px;
+      border: 1.4px solid #dde3eb;
+      border-radius: 11px;
+      background: #f6fafd;
+      padding: 23px 18px 15px 18px;
     }
     .recipient-area legend {
       font-weight: 700;
-      font-size: 1.13rem;
+      font-size: 1.16rem;
+      color: #1d395b;
+      letter-spacing: -0.3px;
+      padding-bottom: 7px;
     }
     .recipient-list {
       margin: 0; padding: 0;
@@ -85,69 +87,100 @@
     .recipient-entry {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 9px;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
     }
-    .recipient-entry input[type="email"] {
-      flex: 1 1 230px;
-      padding: 6px 10px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
+    .recipient-entry input[type="email"],
     .recipient-entry select {
-      flex: 0 0 122px;
-      padding: 5px 9px;
+      padding: 7px 14px;
+      font-size: 1.03rem;
+      border: 1.2px solid #ccd6e2;
+      border-radius: 6px;
+      transition: border 0.18s;
+    }
+    .recipient-entry input[type="email"]:focus,
+    .recipient-entry select:focus {
+      border: 1.2px solid #357abd;
+      outline: none;
     }
     .recipient-entry button {
-      background-color: #dc3545;
-      color: white;
+      background: linear-gradient(90deg, #dc3545 70%, #bb2533 100%);
+      color: #fff;
       border: none;
       border-radius: 4px;
-      padding: 4px 9px;
-      font-size: 0.97rem;
+      padding: 4px 11px;
+      font-size: 1.07rem;
       cursor: pointer;
-      margin-left: 3px;
+      margin-left: 4px;
+      transition: background .16s;
     }
     .recipient-entry button:hover, .recipient-entry button:focus {
-      background-color: #bb2533;
+      background: linear-gradient(90deg, #bb2533, #dc3545 80%);
+      outline: none;
     }
     #add-recipient-btn {
-      margin-top: 8px;
-      background-color: #007bff;
-      color: white;
+      margin-top: 10px;
+      background: linear-gradient(90deg, #4a90e2 60%, #357abd 100%);
+      color: #fff;
       font-weight: 700;
       border: none;
-      border-radius: 4px;
-      padding: 6px 15px;
+      border-radius: 6px;
+      padding: 8px 22px;
       cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.3s;
+      font-size: 1.07rem;
+      transition: background 0.2s;
+      box-shadow: 0 2px 7px rgba(45,100,160,.09);
+      letter-spacing: 0.01em;
     }
     #add-recipient-btn:hover, #add-recipient-btn:focus {
-      background-color: #0056b3;
+      background: linear-gradient(90deg, #357abd 0%, #314a6e 100%);
     }
 
     button[type="submit"] {
-      margin-top: 30px;
-      background-color: #007bff;
-      color: white;
+      margin-top: 34px;
+      background: linear-gradient(90deg, #4a90e2, #357abd);
+      color: #fff;
       font-weight: 700;
-      padding: 12px 20px;
+      padding: 15px 0;
       border: none;
-      border-radius: 6px;
+      border-radius: 11px;
       cursor: pointer;
-      font-size: 1.1rem;
+      font-size: 1.12rem;
+      width: 100%;
+      max-width: 350px;
+      box-shadow: 0 3px 20px rgba(51, 112, 183, 0.11);
+      transition: background 0.2s, box-shadow 0.13s, transform 0.13s;
+      display: block;
+      letter-spacing: 0.01em;
     }
     button[type="submit"]:hover,
     button[type="submit"]:focus {
-      background-color: #0056b3;
+      background: linear-gradient(90deg, #357abd 0%, #314a6e 100%);
+      box-shadow: 0 8px 28px rgba(51, 112, 183, 0.18);
+      transform: translateY(-2px);
+      outline: none;
     }
-    @media (max-width: 600px) {
-      body { padding: 20px 15px; }
-      .container { padding: 20px 7px 30px 7px;}
-      .recipient-entry { flex-direction: column; gap: 4px;}
+    .back-link {
+      display: inline-block;
+      margin-top: 35px;
+      font-size: 1.11rem;
+      color: #4a90e2;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.17s;
+    }
+    .back-link:hover, .back-link:focus {
+      color: #357abd;
+      text-decoration: underline;
+      outline: none;
+    }
+    @media (max-width: 640px) {
+      body { padding: 18px 3.5vw; }
+      .container { padding: 26px 7px 30px 7px;}
+      .recipient-entry { flex-direction: column; gap: 5px;}
       .recipient-entry button { margin-left: 0; align-self: flex-start; }
+      h1 { font-size: 1.23rem; padding-bottom: 7px;}
     }
   </style>
 </head>
@@ -157,7 +190,7 @@
   <form method="POST" action="{{ url_for('finalize_and_share') }}">
     <input type="hidden" name="mom_json" value='{{ mom_json | tojson | safe }}'>
     <input type="hidden" name="summary" value="{{ summary|e }}">
-     <input type="hidden" name="uploaded_video" value="{{ uploaded_video }}">
+    <input type="hidden" name="uploaded_video" value="{{ uploaded_video }}">
     <div class="form-group">
       <label for="mom">Minutes of Meeting</label>
       <textarea id="mom" class="textarea-large" readonly name="mom">{{ mom }}</textarea>
@@ -191,7 +224,6 @@
     &larr; Upload another file
   </a>
 </div>
-
 <script>
 function addRow() {
   const li = document.createElement('li');
@@ -211,7 +243,6 @@ function removeRow(btn) {
   if (document.querySelectorAll('.recipient-entry').length > 1) {
     entry.remove();
   }
-  // else do not remove last (at least one recipient must be present)
 }
 </script>
 </body>

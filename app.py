@@ -4,6 +4,9 @@ import time
 import json
 import copy
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from utils.stt import get_transcript
 from utils.nlp import generate_summary, generate_minutes_of_meeting
 from utils.nlp import transcribe_audio, format_transcript

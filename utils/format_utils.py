@@ -1,3 +1,8 @@
+from flask import Flask, render_template, request
+import markdown
+
+app = Flask(__name__)
+
 def format_mom_as_markdown(mom):
     lines = []
 
@@ -45,9 +50,8 @@ def format_mom_as_markdown(mom):
             sec_title = section.get('section_title', f"Section {idx}")
             lines.append(f"**2.{idx} {sec_title}:**\n")
             points = section.get('points', [])
-            # Join all points in the section as separate sentences instead of bullets
             for point in points:
-                if isinstance(point, dict):  # If point is dict with complex structure
+                if isinstance(point, dict):
                     text = point.get('text', '')
                     if text:
                         lines.append(text.strip() + " ")
@@ -56,7 +60,7 @@ def format_mom_as_markdown(mom):
                         lines.append(sp.strip() + " ")
                 else:
                     lines.append(point.strip() + " ")
-            lines.append("")  # blank line after each section
+            lines.append("")
     else:
         lines.append("### **2. Key Discussion Points**")
         lines.append("No discussion points available.\n")
@@ -109,3 +113,34 @@ def format_mom_as_markdown(mom):
         lines.append(f"**Date of Preparation:** {prep_date}")
 
     return '\n'.join(lines)
+
+@app.route('/mom_view', methods=['GET', 'POST'])
+def mom_view():
+    # Example mom data (replace with real dynamic data)
+    mom_data = {
+        "title": "Team Sync-up",
+        "date": "2025-08-20",
+        "time": "10:00 AM",
+        "venue": "Conference Room A",
+        "attendees": ["Alice", "Bob", "Charlie"],
+        "purpose": "Discuss project updates and next steps.",
+        "discussions": [
+            {"section_title": "Project Updates", "points": ["Finished phase 1", "Delayed module integration"]},
+            {"section_title": "Challenges", "points": ["Resource constraints", "Pending approvals"]}
+        ],
+        "decisions": ["Approved new timeline", "Allocate more developers"],
+        "action_items": [
+            {"item": "Complete testing", "owner": "Alice", "status": "In Progress", "notes": ""},
+            {"item": "Prepare report", "owner": "Bob", "status": "Pending", "notes": "Due next week"},
+        ],
+        "next_steps": ["Schedule follow-up", "Notify stakeholders"],
+        "prepared_by": "Project Manager",
+        "preparation_date": "2025-08-20"
+    }
+
+    markdown_text = format_mom_as_markdown(mom_data)
+
+    # Convert markdown to HTML for preview
+    html_preview = markdown.markdown(markdown_text)
+
+    return render_template('mom_view.html', formatted_mom=markdown_text, html_preview=html_preview)

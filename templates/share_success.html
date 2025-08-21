@@ -1,69 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>MoM Shared Successfully</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f9f9f9;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            max-width: 600px;
-            margin: auto;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #4CAF50;
-        }
-        ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        li {
-            background: #e7f5e7;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 16px;
-            color: #2e7d32;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>MoM Shared Successfully</title>
+  <style>
+    body {
+      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f7fb;
+      margin: 40px 20px;
+      color: #2c3e50;
+      line-height: 1.6;
+    }
+    .container {
+      background: #ffffff;
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 36px 36px 44px 36px;
+      border-radius: 12px;
+      box-shadow: 0 10px 28px rgba(44, 62, 80, 0.08);
+      text-align: center;
+    }
+    h1 {
+      color: #278a41;
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 18px;
+      letter-spacing: -0.4px;
+    }
+    p {
+      font-size: 1.08rem;
+      margin-bottom: 28px;
+      color: #445662;
+    }
+    h3 {
+      font-weight: 600;
+      font-size: 1.35rem;
+      margin-bottom: 16px;
+      color: #34495e;
+      border-bottom: 1.5px solid #dce3e8;
+      padding-bottom: 8px;
+    }
+    h4 {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #2f4050;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    li {
+      background-color: #e4f0df;
+      margin: 6px 0;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #2a5a2c;
+      box-shadow: inset 1px 1px 3px rgba(255,255,255,0.6);
+      user-select: text;
+    }
+    p.no-members {
+      font-style: italic;
+      color: #7a8a99;
+      margin: 12px 0 24px 0;
+      text-align: left;
+      font-size: 1rem;
+    }
+    a {
+      display: inline-block;
+      margin-top: 28px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #3178bb;
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+      transition: color 0.25s, border-color 0.25s;
+    }
+    a:hover,
+    a:focus {
+      color: #215a8a;
+      border-color: #3178bb;
+      outline: none;
+    }
+    @media (max-width: 480px) {
+      body {
+        margin: 20px 15px;
+        font-size: 0.96rem;
+      }
+      .container {
+        padding: 28px 20px 36px 20px;
+      }
+      h1 {
+        font-size: 1.65rem;
+      }
+      h3 {
+        font-size: 1.16rem;
+      }
+      h4 {
+        font-size: 1.01rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Minutes of Meeting Shared Successfully!</h1>
-        <p>The Minutes of Meeting have been saved and emailed to the selected recipients.</p>
+  <div class="container" role="main" aria-label="MoM Shared Confirmation">
+    <h1>Minutes of Meeting Shared Successfully!</h1>
+    <p>The Minutes of Meeting have been saved and emailed to the selected recipients.</p>
 
-        <h3>Recipients who received the MoM:</h3>
+    <h3>Recipients who received the MoM:</h3>
 
-        {% if internal_members %}
-        <h4>Internal Members:</h4>
-        <ul>
-            {% for member in internal_members %}
-            <li>{{ member }}</li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p>No internal members selected.</p>
-        {% endif %}
+    {% if internal_members %}
+      <h4>Internal Members:</h4>
+      <ul>
+        {% for member in internal_members %}
+          <li>{{ member }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="no-members">No internal members selected.</p>
+    {% endif %}
 
-        {% if non_members %}
-        <h4>External Members:</h4>
-        <ul>
-            {% for member in non_members %}
-            <li>{{ member }}</li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p>No external members selected.</p>
-        {% endif %}
+    {% if non_members %}
+      <h4>External Members:</h4>
+      <ul>
+        {% for member in non_members %}
+          <li>{{ member }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="no-members">No external members selected.</p>
+    {% endif %}
 
-        <a href="{{ url_for('upload_and_transcribe') }}">Back to Upload</a>
-    </div>
+    <a href="{{ url_for('upload_and_transcribe') }}" aria-label="Upload another file">
+      &larr; Back to Upload
+    </a>
+  </div>
 </body>
 </html>
