@@ -3,9 +3,12 @@ import os
 import time
 import json
 import copy
+import shutil
 
 from dotenv import load_dotenv
 load_dotenv()
+
+from utils.media_utils import split_media_file
 
 from utils.stt import get_transcript
 from utils.nlp import generate_summary, generate_minutes_of_meeting
@@ -21,7 +24,6 @@ app.secret_key = os.urandom(24)
 UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
-
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_and_transcribe():
@@ -41,17 +43,39 @@ def upload_and_transcribe():
             flash(f"Failed to save the file: {e}", 'error')
             return render_template('transcribe.html')
 
-        transcription = get_transcript(local_path)
-        if not transcription:
-            flash("Transcription failed. Please try again.", 'error')
+        # Split the saved file into chunks (5-minutes each)
+        try:
+            chunks = split_media_file(local_path, chunk_length_sec=300)
+        except Exception as e:
+            flash(f"Failed to split file into chunks: {e}", 'error')
             return render_template('transcribe.html')
 
+        full_transcript_text = ""
+        full_transcript_json_segments = []
+
         try:
-            transcript_text, transcript_json = transcribe_audio(local_path)
-            formatted_transcript = format_transcript(transcript_json)
+            for chunk_file in chunks:
+                text, json_data = transcribe_audio(chunk_file)
+                if text:
+                    full_transcript_text += text + " "
+                if json_data and 'segments' in json_data:
+                    full_transcript_json_segments.extend(json_data['segments'])
         except Exception as e:
-            flash(f"Error processing transcription data: {e}", 'error')
+            flash(f"Error during transcription of chunks: {e}", 'error')
             return render_template('transcribe.html')
+
+        # Clean up chunk files to save disk space
+        try:
+            shutil.rmtree('uploads/chunks')
+        except Exception:
+            pass  # Silently ignore if cleanup fails
+
+        full_transcript_json = {
+            "text": full_transcript_text.strip(),
+            "segments": full_transcript_json_segments
+        }
+
+        formatted_transcript = format_transcript(full_transcript_json)
 
         return render_template(
             'edit_transcription.html',
@@ -61,10 +85,8 @@ def upload_and_transcribe():
 
     return render_template('transcribe.html')
 
-
 @app.route('/generate_mom', methods=['POST'])
 def generate_mom():
-    """Receive edited transcription and generate/display Meeting Summary & Minutes."""
     transcription = request.form.get('transcription', '').strip()
     uploaded_video = request.form.get('uploaded_video', '').strip()
 
@@ -88,10 +110,8 @@ def generate_mom():
         uploaded_video=uploaded_video
     )
 
-
 @app.route('/finalize', methods=['POST'])
 def finalize_and_share():
-    """Receive finalized MoM, send emails, save data, and show success page."""
     transcription = request.form.get('transcription', '').strip()
     mom_text = request.form.get('mom', '').strip()
     mom_json_str = request.form.get('mom_json', '')
@@ -135,12 +155,10 @@ def finalize_and_share():
         flash("Please select at least one recipient.", 'error')
         return redirect(url_for('upload_and_transcribe'))
 
-    # Generate PDFs for internal and non-members
     pdf_buffer_internal = create_mom_pdf(mom_data_dict)
     customized_mom_dict = customize_mom_for_non_members(mom_data_dict)
     pdf_buffer_non_members = create_mom_pdf(customized_mom_dict)
 
-    # Send to internal members - NO HTML template, plain text only
     for email in internal_members:
         send_email(
             to_email=email,
@@ -150,7 +168,6 @@ def finalize_and_share():
         )
         pdf_buffer_internal.seek(0)
 
-    # Send to non-members - NO HTML template
     for email in non_members:
         send_email(
             to_email=email,
@@ -160,7 +177,6 @@ def finalize_and_share():
         )
         pdf_buffer_non_members.seek(0)
 
-    # Save meeting, minutes, and attendee info to DB
     meeting_data = {
         "organization_id": "9a6ac03d-2a3e-42b3-9e1d-1047055cd7a9",
         "meeting_code": "AUTO-" + time.strftime("%Y%m%d%H%M%S"),
@@ -198,9 +214,7 @@ def finalize_and_share():
         non_members=non_members
     )
 
-
 def customize_mom_for_non_members(mom_dict):
-    """Remove sensitive content for non-members."""
     redacted = copy.deepcopy(mom_dict)
     sensitive_keywords = ['confidential', 'internal', 'salary', 'budget']
 
@@ -238,7 +252,6 @@ def customize_mom_for_non_members(mom_dict):
         redacted['discussions'] = filtered_discussions
 
     return redacted
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
